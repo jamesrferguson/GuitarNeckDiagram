@@ -1,15 +1,7 @@
 GTR = {};
 
 GTR.NUMBER_OF_FRETS = 24;
-
-GTR.strings = [
-  ['E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E'],
-	['B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
-	['G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G'],
-	['D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D'],
-	['A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A'],
-	['E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#',  'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E']
-];
+GTR.NUMBER_OF_STRINGS= 6;
 
 GTR.FRETS_WITH_SINGLE_MARKERS = [3, 5, 7, 9, 15, 17, 19, 21];
 GTR.FRETS_WITH_DOUBLE_MARKERS = [12, 24];
@@ -83,14 +75,13 @@ GTR.drawFretMarkersOnNeck = function (cvs) {
 }
 
 GTR.drawStringsOnNeck = function (cvs) {
-  var totalStrings = GTR.strings.length;
+  var totalStrings = GTR.NUMBER_OF_STRINGS;
   for (i = 0; i < totalStrings; i++){
     GTR.AddRectanlgeToNeck(cvs, GTR.NECK_START, GTR.STRING_START + i * GTR.STRING_SPACE, '#ddd', GTR.STRING_LENGTH, GTR.STRING_WIDTH);
   }
 }
 
 GTR.drawNoteOnString = function (cvs, gtrString, fret, noteName='##') {
-  noteName = GTR.strings[gtrString - 1][fret]
   var noteMarker = new fabric.Circle({
     radius: 15,
     fill: 'red',
@@ -122,11 +113,24 @@ function run() {
     GTR.drawStringsOnNeck(canvas);
     GTR.drawFretsOnNeck(canvas);
     GTR.drawFretMarkersOnNeck(canvas);
-    GTR.drawNoteOnString(canvas, 6, 3);
-    GTR.drawNoteOnString(canvas, 5, 12);
-    GTR.drawNoteOnString(canvas, 4, 7);
-    GTR.drawNoteOnString(canvas, 1, 2);
-    GTR.drawNoteOnString(canvas, 2, 9);
+
+    var request = new XMLHttpRequest();
+    request.open('GET', 'http://localhost:5000/scale/G/major', true)
+    request.onload = function() {
+      // Begin accessing JSON data here
+      var data = JSON.parse(this.response);
+
+      if (request.status >= 200 && request.status < 400) {
+        for (i=0; i < data['notes'].length; i++){
+          for(j = 0; j < Object.values(data['notes'][i])[0].length; j++){
+            GTR.drawNoteOnString(canvas, Object.values(data['notes'][i])[0][j][1], Object.values(data['notes'][i])[0][j][0], Object.keys(data['notes'][i])[0]);
+          }
+        }
+      } else {
+        console.log('error');
+      }
+    }
+    request.send();
 }
 
 run();
