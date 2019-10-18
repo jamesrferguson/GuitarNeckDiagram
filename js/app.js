@@ -26,7 +26,6 @@ GTR.STRING_WIDTH = 5;
 GTR.STRING_SPACE = 50;
 GTR.STRING_LENGTH = 1200;
 
-//GuitarNeck.SINGLE_MARKER_LEFT = 144; // halfway between 4th and 3rd strings
 GTR.SINGLE_MARKER_TOP = GTR.STRING_START + 2.5 * GTR.STRING_SPACE; // halfway between 4th and 3rd strings
 GTR.FIRST_DOUBLE_MARKER_TOP = GTR.STRING_START + 1.5 * GTR.STRING_SPACE; // halfway between 5th and 4th strings
 GTR.SECOND_DOUBLE_MARKER_TOP = GTR.STRING_START + 3.5 * GTR.STRING_SPACE; // halfway between 3rd and 2nd strings
@@ -51,7 +50,7 @@ GTR.getFretMarkerLeft = function (fretNo) {
 
 GTR.drawFretsOnNeck = function (cvs) {
     for(i = 0; i <= GTR.NUMBER_OF_FRETS; i++){
-        GTR.AddRectanlgeToNeck(cvs, (i+1) * GTR.FRET_SPACE, GTR.FRET_START,  "#000000", GTR.FRET_WIDTH, GTR.FRET_LENGTH);
+        GTR.AddRectanlgeToNeck(cvs, (i+1) * GTR.FRET_SPACE, GTR.FRET_START, "#000", GTR.FRET_WIDTH, GTR.FRET_LENGTH);
     }
 }
 
@@ -86,15 +85,48 @@ GTR.drawFretMarkersOnNeck = function (cvs) {
 GTR.drawStringsOnNeck = function (cvs) {
   var totalStrings = GTR.strings.length;
   for (i = 0; i < totalStrings; i++){
-    GTR.AddRectanlgeToNeck(cvs, GTR.NECK_START, GTR.STRING_START + i * GTR.STRING_SPACE, '#dddddd', GTR.STRING_LENGTH, GTR.STRING_WIDTH);
+    GTR.AddRectanlgeToNeck(cvs, GTR.NECK_START, GTR.STRING_START + i * GTR.STRING_SPACE, '#ddd', GTR.STRING_LENGTH, GTR.STRING_WIDTH);
   }
 }
 
+GTR.drawNoteOnString = function (cvs, gtrString, fret, noteName='##') {
+  noteName = GTR.strings[gtrString - 1][fret]
+  var noteMarker = new fabric.Circle({
+    radius: 15,
+    fill: 'red',
+    originX: 'center',
+    originY: 'center'
+  });
+
+  var noteText = new fabric.Text(noteName, { 
+    fontFamily: 'Calibri',
+    fontSize: 25,
+    textAlign: 'center',
+    originX: 'center',
+    originY: 'center',
+  });
+
+  var noteTextGroup = new fabric.Group([noteMarker, noteText],{
+    // any group attributes here
+    left: (fret + .25) * GTR.FRET_SPACE,
+    top: (gtrString - 1) * GTR.STRING_SPACE + 0.5 * GTR.STRING_START,
+    lockMovementX: true,
+    lockMovementY: true,
+    selectable: false
+  });
+  cvs.add(noteTextGroup);
+}
+
 function run() {
-  var canvas = new fabric.Canvas('myCanvas');
+    var canvas = new fabric.Canvas('myCanvas');
     GTR.drawStringsOnNeck(canvas);
     GTR.drawFretsOnNeck(canvas);
     GTR.drawFretMarkersOnNeck(canvas);
+    GTR.drawNoteOnString(canvas, 6, 3);
+    GTR.drawNoteOnString(canvas, 5, 12);
+    GTR.drawNoteOnString(canvas, 4, 7);
+    GTR.drawNoteOnString(canvas, 1, 2);
+    GTR.drawNoteOnString(canvas, 2, 9);
 }
 
 run();
