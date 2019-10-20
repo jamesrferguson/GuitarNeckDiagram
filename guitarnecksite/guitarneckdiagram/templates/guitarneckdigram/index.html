@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guitar Neck</title>
+</head>
+<body>
+  
+  <canvas
+    id="myCanvas"
+    width="1300"
+    height="300"
+    style="border:1px solid #000000;">
+  </canvas>
+  <form>
+        <select name="Note" id="scaleKey">
+            <option value="A">A</option>
+            <option value="A#">A#</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="C#">C#</option>
+            <option value="D">D</option>
+            <option value="D#">D#</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="F#">F#</option>
+            <option value="G">G</option>
+            <option value="G#">G#</option>
+        </select>
+        <select id="scaleType">
+            <option value="major">major</option>
+            <option value="minor">minor</option>
+        </select>
+        <button type="button" id="getnotes">Click Me!</button> 
+    </form>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.4.0/fabric.min.js"></script>
+  {% load static %}
+  <script src="{% static 'guitarneckdiagram/js/app.js' %}"></script>
+</body>
+</html>

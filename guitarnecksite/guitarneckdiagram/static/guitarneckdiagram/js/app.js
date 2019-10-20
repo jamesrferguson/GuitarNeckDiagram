@@ -81,10 +81,10 @@ GTR.drawStringsOnNeck = function (cvs) {
   }
 }
 
-GTR.drawNoteOnString = function (cvs, gtrString, fret, noteName='##') {
+GTR.drawNoteOnString = function (cvs, gtrString, fret, noteName='##', color='red') {
   var noteMarker = new fabric.Circle({
     radius: 15,
-    fill: 'red',
+    fill: color,
     originX: 'center',
     originY: 'center'
   });
@@ -108,14 +108,19 @@ GTR.drawNoteOnString = function (cvs, gtrString, fret, noteName='##') {
   cvs.add(noteTextGroup);
 }
 
-function run() {
-    var canvas = new fabric.Canvas('myCanvas');
-    GTR.drawStringsOnNeck(canvas);
-    GTR.drawFretsOnNeck(canvas);
-    GTR.drawFretMarkersOnNeck(canvas);
+GTR.getNotes = function (cvs) {
+    cvs.clear(); // remove anything currently on canvas
+    GTR.drawStringsOnNeck(cvs);
+    GTR.drawFretsOnNeck(cvs);
+    GTR.drawFretMarkersOnNeck(cvs);
+
+    var scaleKey = document.getElementById("scaleKey") 
+    var scaleType = document.getElementById("scaleType") 
+    console.log(scaleKey.options[scaleKey.selectedIndex].text);
+    console.log(scaleType.options[scaleType.selectedIndex].text);
 
     var request = new XMLHttpRequest();
-    request.open('GET', 'http://localhost:5000/scale/G/major', true)
+    request.open('GET', 'http://localhost:8000/scale/' + escape(scaleKey.options[scaleKey.selectedIndex].text) + '/' + scaleType.options[scaleType.selectedIndex].text, true);
     request.onload = function() {
       // Begin accessing JSON data here
       var data = JSON.parse(this.response);
@@ -123,7 +128,12 @@ function run() {
       if (request.status >= 200 && request.status < 400) {
         for (i=0; i < data['notes'].length; i++){
           for(j = 0; j < Object.values(data['notes'][i])[0].length; j++){
-            GTR.drawNoteOnString(canvas, Object.values(data['notes'][i])[0][j][1], Object.values(data['notes'][i])[0][j][0], Object.keys(data['notes'][i])[0]);
+            if (i == 0){            
+                GTR.drawNoteOnString(cvs, Object.values(data['notes'][i])[0][j][1], Object.values(data['notes'][i])[0][j][0], Object.keys(data['notes'][i])[0], 'blue');
+            }
+            else{
+                GTR.drawNoteOnString(cvs, Object.values(data['notes'][i])[0][j][1], Object.values(data['notes'][i])[0][j][0], Object.keys(data['notes'][i])[0]);
+            }
           }
         }
       } else {
@@ -131,6 +141,16 @@ function run() {
       }
     }
     request.send();
+}
+
+function run() {
+    var canvas = new fabric.Canvas('myCanvas');
+    GTR.drawStringsOnNeck(canvas);
+    GTR.drawFretsOnNeck(canvas);
+    GTR.drawFretMarkersOnNeck(canvas);
+
+    document.getElementById("getnotes").onclick = function() {GTR.getNotes(canvas)};
+    
 }
 
 run();
